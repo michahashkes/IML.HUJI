@@ -52,10 +52,12 @@ class UnivariateGaussian:
         Sets `self.mu_`, `self.var_` attributes according to calculated estimation (where
         estimator is either biased or unbiased). Then sets `self.fitted_` attribute to `True`
         """
-        # raise NotImplementedError()
 
         self.mu_ = X.mean()
-        self.var_ = X.var()
+        if self.biased_:
+            self.mu_ = X.var()
+        else:
+            self.mu_ = X.var(ddof=1)
 
         self.fitted_ = True
         return self
@@ -80,12 +82,11 @@ class UnivariateGaussian:
         """
         if not self.fitted_:
             raise ValueError("Estimator must first be fitted before calling `pdf` function")
-        return norm.pdf(X, self.mu_, self.var_ ** 0.5)
-        # raise NotImplementedError()
-        # sd = self.var_ ** 0.5
-        # exp = np.exp(((X - self.mu_ / sd) ** 2) * -0.5)
-        # coeff = 1 / (2 * np.pi * self.var_)
-        # return coeff * exp
+        # return norm.pdf(X, self.mu_, self.var_ ** 0.5)
+        sd = self.var_ ** 0.5
+        exp = np.exp(-0.5 * (((X - self.mu_) / sd) ** 2))
+        coeff = 1 / ((2 * np.pi * self.var_) ** 0.5)
+        return coeff * exp
 
 
     @staticmethod
@@ -107,8 +108,10 @@ class UnivariateGaussian:
         log_likelihood: float
             log-likelihood calculated
         """
-        return np.log(norm.pdf(X, mu, sigma).sum())
-        # raise NotImplementedError()
+        exp = np.exp(-0.5 * (((X - mu) / sigma) ** 2))
+        coeff = 1 / ((2 * np.pi * (sigma ** 2)) ** 0.5)
+        pdf = coeff * exp
+        return np.log(pdf.sum())
 
 
 class MultivariateGaussian:
