@@ -14,7 +14,7 @@ def test_univariate_gaussian():
 
     # Question 2 - Empirically showing sample mean is consistent
     distances = []
-    num_samples = np.arange(10, 1010, 10)
+    num_samples = np.linspace(10, 1000, 100).astype(int)
     for n in num_samples:
         expected = UnivariateGaussian().fit(samples[:n]).mu_
         distances.append(abs(expected - 10))
