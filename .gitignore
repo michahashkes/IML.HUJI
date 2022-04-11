@@ -6,9 +6,8 @@ code\ examples/*.gif
 *.ipynb
 figures/*.png
 .idea
-__pycache__
-lab/.ipynb_checkpoints/
-code\ examples/.ipynb_checkpoints/
+**__pycache__
+**.ipynb_checkpoints
 
 code examples
 lab

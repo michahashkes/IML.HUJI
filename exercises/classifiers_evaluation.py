@@ -1,14 +1,11 @@
-import os.path
-
 from IMLearn.learners.classifiers import Perceptron, LDA, GaussianNaiveBayes
-import numpy as np
 from typing import Tuple
+from utils import *
 import plotly.graph_objects as go
 import plotly.express as px
 import plotly.io as pio
 from plotly.subplots import make_subplots
-
-pio.templates.default = "simple_white"
+from math import atan2, pi
 
 
 def load_dataset(filename: str) -> Tuple[np.ndarray, np.ndarray]:
@@ -30,8 +27,8 @@ def load_dataset(filename: str) -> Tuple[np.ndarray, np.ndarray]:
         Class vector specifying for each sample its class
 
     """
-    dataset = np.load(filename)
-    return dataset[:, :2], dataset[:, 2]
+    data = np.load(filename)
+    return data[:, :2], data[:, 2].astype(int)
 
 
 def run_perceptron():
@@ -55,7 +52,7 @@ def run_perceptron():
         per = Perceptron(callback=loss_callback)
         per.fit(X, y)
 
-        # Plot figure
+        # Plot figure of loss as function of fitting iteration
         fig = px.line(x=np.arange(len(losses)), y=losses,
                       title=f"Plot of Perceptron losses by iteration of {n} data",
                       labels={'x': 'Iteration', 'y': 'Loss of trained data'})
@@ -64,6 +61,31 @@ def run_perceptron():
 
         # fig = px.scatter(x=X[:,0], y=X[:,1], color=per.predict(X).astype(str))
         # fig.show()
+
+
+def get_ellipse(mu: np.ndarray, cov: np.ndarray):
+    """
+    Draw an ellipse centered at given location and according to specified covariance matrix
+
+    Parameters
+    ----------
+    mu : ndarray of shape (2,)
+        Center of ellipse
+
+    cov: ndarray of shape (2,2)
+        Covariance of Gaussian
+
+    Returns
+    -------
+        scatter: A plotly trace object of the ellipse
+    """
+    l1, l2 = tuple(np.linalg.eigvalsh(cov)[::-1])
+    theta = atan2(l1 - cov[0, 0], cov[0, 1]) if cov[0, 1] != 0 else (np.pi / 2 if cov[0, 0] < cov[1, 1] else 0)
+    t = np.linspace(0, 2 * pi, 100)
+    xs = (l1 * np.cos(theta) * np.cos(t)) - (l2 * np.sin(theta) * np.sin(t))
+    ys = (l1 * np.sin(theta) * np.cos(t)) + (l2 * np.cos(theta) * np.sin(t))
+
+    return go.Scatter(x=mu[0] + xs, y=mu[1] + ys, mode="lines", marker_color="black")
 
 
 def compare_gaussian_classifiers():
@@ -79,7 +101,17 @@ def compare_gaussian_classifiers():
 
         # Plot a figure with two suplots, showing the Gaussian Naive Bayes predictions on the left and LDA predictions
         # on the right. Plot title should specify dataset used and subplot titles should specify algorithm and accuracy
+        # Create subplots
         from IMLearn.metrics import accuracy
+        raise NotImplementedError()
+
+        # Add traces for data-points setting symbols and colors
+        raise NotImplementedError()
+
+        # Add `X` dots specifying fitted Gaussians' means
+        raise NotImplementedError()
+
+        # Add ellipses depicting the covariances of the fitted Gaussians
         raise NotImplementedError()
 
 
