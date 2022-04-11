@@ -24,7 +24,6 @@ def load_data(filename: str):
     DataFrame or a Tuple[DataFrame, Series]
     """
     df = pd.read_csv(filename)
-    print(df.shape)
     columns_to_check = {'id': 'all', 'date': 'nan', 'price': 'all', 'bedrooms': 'all',
                         'bathrooms': 'negative_nan', 'sqft_living': 'all', 'sqft_lot': 'all',
                         'floors': 'all', 'waterfront': 'nan', 'view': 'nan', 'condition': 'all',
@@ -37,9 +36,7 @@ def load_data(filename: str):
                       'nan': lambda x, col: x.drop(x[(x[col].isna())].index)}
     for column in columns_to_check:
         df = drop_functions[columns_to_check[column]](df, column)
-    print(df.shape)
     df = df.drop(df[df['sqft_living'] > df['sqft_lot']].index)
-    print(df.shape)
     df['is_renovated'] = df['yr_renovated']
     df.loc[df['is_renovated'] != 0, 'is_renovated'] = 1
 

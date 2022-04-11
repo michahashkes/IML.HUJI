@@ -52,7 +52,7 @@ class LinearRegression(BaseEstimator):
         """
         if self.include_intercept_:
             X = np.c_[np.ones(X.shape[0]), X]
-        self.coefs_ = pinv(X.T @ X) @ X.T @ y
+        self.coefs_ = pinv(X) @ y
 
 
     def _predict(self, X: np.ndarray) -> np.ndarray:

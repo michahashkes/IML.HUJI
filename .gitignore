@@ -3,6 +3,7 @@ code\ examples/*.png
 code\ examples/*.gif
 *.png
 *.gif
+*.ipynb
 figures/*.png
 .idea
 __pycache__
