@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import NoReturn
 from ...base import BaseEstimator
+from ...metrics import mean_square_error
 import numpy as np
 
 
@@ -59,7 +60,32 @@ class RidgeRegression(BaseEstimator):
         -----
         Fits model with or without an intercept depending on value of `self.include_intercept_`
         """
-        raise NotImplementedError()
+        n_samples, n_features = X.shape[0], X.shape[1]
+        if self.include_intercept_:
+            X = np.c_[np.ones(len(X)), X]
+            lam_matrix = self.lam_ * np.identity(n_features + 1)
+            lam_matrix[0, 0] = 0
+        else:
+            lam_matrix = self.lam_ * np.identity(n_features)
+        self.coefs_ = np.linalg.inv((X.T @ X) + lam_matrix) @ X.T @ y
+
+        # if self.include_intercept_:
+        #     X = np.c_[np.ones(len(X)), X]
+        #
+        # U, sigma, V = np.linalg.svd(X)
+        # sigma = sigma / (sigma ** 2 + self.lam_)
+        # s = np.zeros((V.shape[1], U.shape[1]))
+        # np.fill_diagonal(s, sigma)
+        #
+        # self.coefs_ = V @ s @ U.T @ y
+
+        # n_samples, n_features = X.shape[0], X.shape[1]
+        # lam_matrix = np.sqrt(self.lam_) * np.identity(n_features)
+        # X_lam = np.vstack((X, lam_matrix))
+        # y_lam = np.concatenate((y, np.zeros(n_features)))
+        # if self.include_intercept_:
+        #     X_lam = np.c_[np.ones(n_samples + n_features), X_lam]
+        # self.coefs_ = np.linalg.pinv(X_lam) @ y_lam
 
     def _predict(self, X: np.ndarray) -> np.ndarray:
         """
@@ -75,7 +101,9 @@ class RidgeRegression(BaseEstimator):
         responses : ndarray of shape (n_samples, )
             Predicted responses of given samples
         """
-        raise NotImplementedError()
+        if self.include_intercept_:
+            X = np.c_[np.ones(X.shape[0]), X]
+        return X @ self.coefs_
 
     def _loss(self, X: np.ndarray, y: np.ndarray) -> float:
         """
@@ -94,4 +122,4 @@ class RidgeRegression(BaseEstimator):
         loss : float
             Performance under MSE loss function
         """
-        raise NotImplementedError()
+        return mean_square_error(y, self._predict(X))
